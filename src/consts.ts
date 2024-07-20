@@ -1,1 +1,2 @@
-export const BASE_URL = "http://localhost:5005/api";
+export const BASE_URL =
+  "https://triviabot-admin-server-production.up.railway.app";

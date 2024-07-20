@@ -166,6 +166,7 @@ function App() {
 
   useEffect(() => {
     getQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizDate]);
 
   useEffect(() => {
