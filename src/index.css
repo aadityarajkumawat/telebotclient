@@ -15,3 +15,31 @@ body,
   height: 100%;
   width: 100%;
 }
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.appear {
+  animation: appear 0.3s linear forwards;
+}
+
+@keyframes slide_in {
+  0% {
+    transform: translateY(20%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.slide_in {
+  animation: slide_in 0.3s linear forwards;
+}

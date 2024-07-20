@@ -3,6 +3,7 @@ import "./App.css";
 import moment from "moment";
 import { BASE_URL } from "./consts";
 import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 
 interface Question {
   question: string;
@@ -70,6 +71,9 @@ function App() {
   const navigate = useNavigate();
   const [showToast, setShowToast] = useState<string>("");
   const [quizDate, setQuizDate] = useState<any>(moment.utc());
+  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [roomStart, setRoomStart] = useState<any>("19:00");
+  const [gameStart, setGameStart] = useState<any>("19:30");
   const [questions, setQuestions] = useState<Array<Question>>([
     {
       question: "",
@@ -82,6 +86,39 @@ function App() {
       answers: [],
     },
   ]);
+
+  async function updateGameTime() {
+    const res = await fetch(`${BASE_URL}/game-time`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        roomStartHour: roomStart.split(":")[0],
+        roomStartMinute: roomStart.split(":")[1],
+        gameStartHour: gameStart.split(":")[0],
+        gameStartMinute: gameStart.split(":")[1],
+      }),
+    });
+    const body = await res.json();
+
+    if (body && body.status === "success") {
+      setShowToast("Game time updated successfully");
+      return;
+    } else {
+      setShowToast("Failed to update game time");
+    }
+  }
+
+  async function getGameTime() {
+    const res = await fetch(`${BASE_URL}/game-time`);
+    const body = await res.json();
+
+    if (body.gameStart && body.roomStart) {
+      setGameStart(body.gameStart);
+      setRoomStart(body.roomStart);
+    }
+  }
 
   async function getQuestions() {
     const res = await fetch(`${BASE_URL}/todays-quiz`, {
@@ -164,6 +201,72 @@ function App() {
     await getQuestions();
   }
 
+  const portal = createPortal(
+    <>
+      {showSettings ? (
+        <>
+          <div
+            onClick={() => setShowSettings(false)}
+            className="absolute w-full h-full appear top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-10"
+          ></div>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="absolute rounded-md slide_in bg-white p-4 z-20 w-[400px]"
+            style={{
+              top: "calc(50% - 150px)",
+              left: "calc(50% - 150px)",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <h1 className="text-base mb-3 underline">Game Settings (UTC)</h1>
+
+            <div className="flex items-center gap-2 justify-between mb-2">
+              <p className="text-sm">Room Start Time:</p>
+              <input
+                className="border text-sm rounded-md p-2"
+                type="time"
+                value={roomStart}
+                onChange={(e) => {
+                  setRoomStart(e.target.value);
+                }}
+              />
+            </div>
+            <div className="flex items-center gap-2 justify-between">
+              <p className="text-sm">Game Start Time:</p>
+              <input
+                className="border text-sm rounded-md p-2"
+                type="time"
+                value={gameStart}
+                onChange={(e) => {
+                  setGameStart(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="w-full flex items-center justify-end mt-4">
+              <button
+                onClick={async () => {
+                  await updateGameTime();
+                }}
+                className="px-3 py-1 bg-orange-500 rounded-md text-white"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
+    </>,
+    document.getElementById("portal")!
+  );
+
+  useEffect(() => {
+    getGameTime();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     getQuestions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -179,7 +282,8 @@ function App() {
 
   return (
     <div className="App w-full h-full">
-      <div className="border m-auto w-5/12 h-full p-4">
+      {portal}
+      <div className="border m-auto w-5/12 min-w-[700px] h-full p-4">
         <div className="flex items-center justify-between">
           <h1 className="underline text-xl">TriviaBot Admin Panel</h1>
           <h2
@@ -196,15 +300,41 @@ function App() {
         <div className="flex items-center justify-between">
           <h2 className="text-lg my-4">Schedule questions</h2>
           <div className="flex items-center gap-2">
-            <p>Quiz Date (UTC):</p>
-            <input
-              className="border rounded-md p-2"
-              type="date"
-              value={quizDate.format("yyyy-MM-DD")}
-              onChange={(e) => {
-                setQuizDate(moment.utc(e.target.value));
-              }}
-            />
+            <div className="flex items-center gap-2">
+              <p className="text-sm">Quiz Date:</p>
+              <input
+                className="border text-sm rounded-md p-2"
+                type="date"
+                value={quizDate.format("yyyy-MM-DD")}
+                onChange={(e) => {
+                  setQuizDate(moment.utc(e.target.value));
+                }}
+              />
+            </div>
+            {/* <button
+              onClick={() => setShowSettings(true)}
+              className="border p-1 border-zinc-300 rounded-md hover:bg-zinc-100 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                />
+              </svg>
+            </button> */}
           </div>
         </div>
         <ul
