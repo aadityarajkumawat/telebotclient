@@ -166,6 +166,23 @@ function App() {
   }
 
   async function saveQuestions() {
+    // make sure questions are not empty and have at least one answer
+
+    const emptyQuestions = questions.filter(
+      (q) =>
+        q.question === "" ||
+        q.options.option1 === "" ||
+        q.options.option2 === "" ||
+        q.options.option3 === "" ||
+        q.options.option4 === "" ||
+        q.answers.length === 0
+    );
+
+    if (emptyQuestions.length > 0) {
+      setShowToast("Please fill all fields and select at least one answer");
+      return "failed";
+    }
+
     const res = await fetch(`${BASE_URL}/save-questions`, {
       method: "POST",
       headers: {
@@ -180,9 +197,10 @@ function App() {
 
     if (body && body.status === "success") {
       setShowToast("Questions saved successfully");
-      return;
+      return "saved";
     } else {
       setShowToast("Failed to save questions");
+      return "failed";
     }
   }
 
@@ -199,8 +217,10 @@ function App() {
   }
 
   async function submit() {
-    await saveQuestions();
-    await getQuestions();
+    const status = await saveQuestions();
+    if (status === "saved") {
+      await getQuestions();
+    }
   }
 
   const portal = createPortal(
