@@ -13,7 +13,6 @@ interface Question {
     option3: string;
     option4: string;
   };
-  answers: Array<string>;
 }
 
 interface OptionInputProps {
@@ -27,8 +26,6 @@ interface OptionInputProps {
 }
 
 function OptionInput(props: OptionInputProps) {
-  const ques = props.ques;
-  const i = props.i;
   return (
     <div className="flex w-full items-center justify-start border rounded-md">
       <input
@@ -39,30 +36,6 @@ function OptionInput(props: OptionInputProps) {
         name={props.optionName}
         onChange={props.onChange(props.i)}
       />
-      <div
-        role="button"
-        onClick={() => {
-          props.setQuestions((p: any) => {
-            const newQuestions = [...p];
-            if (newQuestions[i].answers.includes(props.option)) {
-              newQuestions[i].answers = newQuestions[i].answers.filter(
-                (ans: any) => ans !== props.option
-              );
-              return newQuestions;
-            }
-            newQuestions[i].answers = [
-              ...newQuestions[i].answers,
-              props.option,
-            ];
-            return newQuestions;
-          });
-        }}
-        className={
-          ques.answers.includes(props.option)
-            ? `w-10 rounded-r-md h-full border-l bg-orange-500`
-            : `w-10 rounded-r-md h-full border-l`
-        }
-      ></div>
     </div>
   );
 }
@@ -83,7 +56,6 @@ function App() {
         option3: "",
         option4: "",
       },
-      answers: [],
     },
   ]);
 
@@ -145,7 +117,6 @@ function App() {
             option3: "",
             option4: "",
           },
-          answers: [],
         },
       ]);
       return;
@@ -160,7 +131,6 @@ function App() {
           option3: q.option3,
           option4: q.option4,
         },
-        answers: q.answers.filter((ans: any) => ans !== ""),
       }))
     );
   }
@@ -174,8 +144,7 @@ function App() {
         q.options.option1 === "" ||
         q.options.option2 === "" ||
         q.options.option3 === "" ||
-        q.options.option4 === "" ||
-        q.answers.length === 0
+        q.options.option4 === ""
     );
 
     if (emptyQuestions.length > 0) {
@@ -358,7 +327,6 @@ function App() {
                               option3: "",
                               option4: "",
                             },
-                            answers: [],
                           });
                         }
                         return newQuestions;
