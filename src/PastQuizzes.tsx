@@ -10,7 +10,6 @@ export function PastQuizzes() {
       option2: string;
       option3: string;
       option4: string;
-      answers: Array<string>;
     }[];
   }>({});
 
@@ -73,14 +72,7 @@ export function PastQuizzes() {
               {expanded === quiz && (
                 <ul>
                   {quizzes[quiz].map(
-                    ({
-                      question,
-                      option1,
-                      option2,
-                      option3,
-                      option4,
-                      answers,
-                    }: any) => (
+                    ({ question, option1, option2, option3, option4 }: any) => (
                       <li
                         className="border w-full p-2 rounded-md mb-3"
                         key={question}
@@ -88,34 +80,10 @@ export function PastQuizzes() {
                         <h3 className="font-bold">Q. {question}</h3>
 
                         <div>
-                          <p
-                            className={
-                              answers.includes(option1) ? "text-orange-600" : ""
-                            }
-                          >
-                            a. {option1}
-                          </p>
-                          <p
-                            className={
-                              answers.includes(option2) ? "text-orange-600" : ""
-                            }
-                          >
-                            b. {option2}
-                          </p>
-                          <p
-                            className={
-                              answers.includes(option3) ? "text-orange-600" : ""
-                            }
-                          >
-                            c. {option3}
-                          </p>
-                          <p
-                            className={
-                              answers.includes(option4) ? "text-orange-600" : ""
-                            }
-                          >
-                            d. {option4}
-                          </p>
+                          <p>a. {option1}</p>
+                          <p>b. {option2}</p>
+                          <p>c. {option3}</p>
+                          <p>d. {option4}</p>
                         </div>
                       </li>
                     )
