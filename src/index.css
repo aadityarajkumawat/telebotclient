@@ -43,3 +43,14 @@ body,
 .slide_in {
   animation: slide_in 0.3s linear forwards;
 }
+
+/* hide scroll bar */
+
+.no-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

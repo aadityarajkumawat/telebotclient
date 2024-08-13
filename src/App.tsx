@@ -272,24 +272,45 @@ function App() {
   }, [showToast]);
 
   return (
-    <div className="App w-full h-full">
+    <div className="App w-full h-full flex items-start justify-start">
       {portal}
-      <div className="border m-auto w-5/12 min-w-[700px] h-full p-4">
-        <div className="flex items-center justify-between">
+      <div className="w-[350px] border-r h-full px-5 py-5 bg-zinc-100">
+        <div>
           <h1 className="underline text-xl">TriviaBot Admin Panel</h1>
-          <h2
-            className="underline cursor-pointer"
-            onClick={() => navigate("/past-quizzes")}
-          >
-            Past Quizzes
+          <h2 className="my-2 text-zinc-600">
+            Time: {new Date().toUTCString()}
           </h2>
         </div>
-        <h2 className="my-2 text-zinc-600">
-          Time (UTC): {new Date().toUTCString()}
-        </h2>
 
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg my-4">Schedule questions</h2>
+        <div className="mt-5">
+          <ul>
+            <li
+              role="button"
+              className="mb-2 hover:text-orange-500 transition-all px-2 py-2 rounded-md hover:bg-white"
+              onClick={() => navigate("/")}
+            >
+              Home
+            </li>
+            <li
+              role="button"
+              className="mb-2 hover:text-orange-500 transition-all px-2 py-2 rounded-md hover:bg-white"
+              onClick={() => navigate("/past-quizzes")}
+            >
+              Past Quizzes
+            </li>
+            <li
+              role="button"
+              className="mb-2 hover:text-orange-500 transition-all px-2 py-2 rounded-md hover:bg-white"
+              onClick={() => navigate("/leaderboard")}
+            >
+              Leaderboard
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div className="w-5/12 min-w-[700px] h-full flex flex-col">
+        <div className="flex items-center justify-between p-3">
+          <h2 className="text-lg font-medium">Schedule questions</h2>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2">
               <p className="text-sm">Quiz Date:</p>
@@ -304,10 +325,7 @@ function App() {
             </div>
           </div>
         </div>
-        <ul
-          className="overflow-y-scroll"
-          style={{ height: "calc(100% - 200px)" }}
-        >
+        <ul className="overflow-y-scroll flex-1 no-scroll px-3 pb-3">
           {questions.map((ques, i) => (
             <li key={i} className="mb-4">
               <div className="border rounded-md p-4">
@@ -402,7 +420,7 @@ function App() {
           ))}
         </ul>
 
-        <div className="flex justify-between w-full gap-3">
+        <div className="flex justify-between w-full gap-3 p-3">
           <button
             onClick={() => {
               setQuestions((p) => [
